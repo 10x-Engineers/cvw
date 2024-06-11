@@ -33,6 +33,13 @@
     `include "idv/idv.svh"
 `endif
 
+`ifdef RVVI_COVERAGE
+    `include "coverage/RISCV_trace_data.svh"
+    `include "coverage/test_vm39_coverage.sv"
+    `include "coverage/test_vm48_coverage.sv"
+    `include "coverage/test_zicbom_coverage.sv"
+    `include "coverage/test_zicntr_coverage.sv"
+`endif
 
 import cvw::*;
 
@@ -930,6 +937,14 @@ test_pmp_coverage #(P) pmp_inst(clk);
 `endif
   /* verilator lint_on WIDTHTRUNC */
   /* verilator lint_on WIDTHEXPAND */
+`ifdef RVVI_COVERAGE
+    rvviTrace #(.XLEN(P.XLEN), .FLEN(P.FLEN)) rvvi();
+    wallyTracer #(P) wallyTracer(rvvi);
+    test_vm39_coverage #(P) vm39_inst(clk);
+    test_vm48_coverage #(P) vm48_inst(clk);
+    test_zicbom_coverage #(P) zicbom_inst(clk);
+    test_zicntr_coverage #(P) zicntr_inst(clk);
+`endif
 
 endmodule
 
