@@ -25,7 +25,7 @@ TARGET=$(WORKING_DIR)/target
 # INCLUDE_PATH are pathes that Verilator should search for files it needs
 INCLUDE_PATH="-I${WALLY}/config/shared" "-I${WALLY}/config/$(WALLYCONF)" "-I${WALLY}/config/deriv/$(WALLYCONF)"
 # SOURCES are source files
-SOURCES=${WALLY}/src/cvw.sv ${WALLY}/testbench/${TESTBENCH}.sv ${WALLY}/testbench/common/*.sv ${WALLY}/src/*/*.sv ${WALLY}/src/*/*/*.sv
+SOURCES=${WALLY}/src/cvw.sv ${WALLY}/testbench/${TESTBENCH}.sv ${WALLY}/testbench/common/*.sv ${WALLY}/src/*/*.sv ${WALLY}/src/*/*/*.sv ${WALLY}/addins/verilog-ethernet/*/*.sv ${WALLY}/addins/verilog-ethernet/*/*/*/*.sv
 # DEPENDENCIES are configuration files and source files, which leads to recompilation of executables
 DEPENDENCIES=${WALLY}/config/shared/*.vh $(SOURCES)
 
@@ -44,7 +44,11 @@ default: run
 
 run: wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH}
 	mkdir -p $(VERILATOR_DIR)/logs
+<<<<<<< HEAD
 	wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH} ${ARGTEST} $(EXTRA_ARGS) 
+=======
+	wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH} ${ARGTEST} 
+>>>>>>> 9471dcd29... Refactored the fpga and testbench so the RVVI can be synthesized cleanly and simulated without any major code changes.
 
 profile: obj_dir_profiling/V${TESTBENCH}_$(WALLYCONF)
 	$(VERILATOR_DIR)/obj_dir_profiling/V${TESTBENCH}_$(WALLYCONF) ${ARGTEST}

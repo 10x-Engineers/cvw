@@ -288,7 +288,7 @@ def addLockstepTestsByDir(dir, config, sim):
     for file in os.listdir(dir):
         if file.endswith(".elf"):
             fullfile = os.path.join(dir, file)
-            sim_log = sim_logdir + config + "_" + file
+            sim_log = sim_logdir + config + "_" + file + ".log"
             grepstring = ""
             tc = TestCase(
                     name=file,
@@ -395,7 +395,7 @@ elif (args.fcov):  # only run RV64GC tests on Questa in lockstep in functional c
     #        grepstr="SUCCESS! All tests ran without failures",
     #        grepfile = sim_log)
     #configs.append(tc)
-elif (args.fcovrvvi):  # only run RV64GC tests on Questa in code coverage mode
+elif (args.fcovrvvi):  # only run RV64GC tests on Questa in rvvi coverage mode
     addTests(tests64gc_nofp, coveragesim)
     if (args.fp):
         addTests(tests64gc_fp, coveragesim)
@@ -508,9 +508,9 @@ def main():
     if args.ccov:
         TIMEOUT_DUR = 20*60 # seconds
         os.system('rm -f questa/cov/*.ucdb')
-    elif args.fcovrvvvi:
-        TIMEOUT_DUR = 1*60
-        os.system('rm -f questa/fcov_rvvi/*')
+    elif args.fcovrvvi:
+        TIMEOUT_DUR = 20*60
+        os.system('rm -f questa/fcovrvvi_ucdb/* questa/fcovrvvi_logs/* questa/fcovrvvi/*')
     elif args.fcov:
         TIMEOUT_DUR = 1*60
         os.system('rm -f questa/fcov_ucdb/* questa/fcov_logs/* questa/fcov/*')
@@ -545,6 +545,8 @@ def main():
        os.system('make QuestaCodeCoverage')
     if args.fcov:
        os.system('make QuestaFunctCoverage')
+    if args.fcovrvvi:
+        os.system('make QuestaFunctCoverageRvvi')
     # Count the number of failures
     if num_fail:
         print(f"{bcolors.FAIL}Regression failed with %s failed configurations{bcolors.ENDC}" % num_fail)

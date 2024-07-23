@@ -193,7 +193,9 @@ config/deriv
 docs/docker/buildroot-config-src
 docs/docker/testvector-generation
 sim/questa/cov
-sim/questa/fcov_rvvi
+sim/questa/fcovrvvi 
+sim/questa/fcovrvvi_logs
+sim/questa/fcovrvvi_ucdb
 sim/covhtmlreport/
 sim/questa/logs
 sim/questa/wkdir
@@ -244,3 +246,4 @@ tests/functcov/*
 tests/functcov/*/*
 sim/vcs/simprofile*
 sim/verilator/verilator.log
+/fpga/rvvidaemon/rvvidaemon

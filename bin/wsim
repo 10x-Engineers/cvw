@@ -34,6 +34,7 @@ parser.add_argument("--vcd", "-v", help="Generate testbench.vcd", action="store_
 parser.add_argument("--lockstep", "-l", help="Run ImperasDV lock, step, and compare.", action="store_true")
 parser.add_argument("--locksteplog", "-b", help="Retired instruction number to be begin logging.", default=0)
 parser.add_argument("--covlog", "-d", help="Log coverage after n instructions.", default=0)
+parser.add_argument("--rvvi", "-r", help="Simulate rvvi hardware interface and ethernet.", action="store_true")
 args = parser.parse_args()
 print("Config=" + args.config + " tests=" + args.testsuite + " sim=" + args.sim + " gui=" + str(args.gui) + " args='" + args.args + "'")
 ElfFile=""
@@ -57,13 +58,16 @@ if(args.testsuite.endswith('.elf') and args.elf == ""): # No --elf argument; che
 
 
 # Validate arguments
-if (args.gui or args.ccov or args.fcov or args.lockstep):
+if (args.gui or args.ccov or args.fcov or args.fcovrvvi or args.lockstep):
     if args.sim not in ["questa", "vcs"]:
         print("Option only supported for Questa and VCS")
         exit(1)
 
 if (args.vcd):
     args.args += " -DMAKEVCD=1"
+
+if (args.rvvi):
+    args.args += " -GRVVI_SYNTH_SUPPORTED=1"
 
 # if lockstep is enabled, then we need to pass the Imperas lockstep arguments
 if(int(args.locksteplog) >= 1): EnableLog = 1
@@ -97,7 +101,7 @@ if (args.fcovrvvi):
 
 #  create the output sub-directories.
 regressionDir = WALLY + '/sim/'
-for d in ["logs", "wkdir", "cov", "ucdb", "fcov", "fcov_ucdb", "fcov_rvvi"]:
+for d in ["logs", "wkdir", "cov", "ucdb", "fcov", "fcov_ucdb", "fcovrvvi", "fcovrvvi_ucdb", "fcovrvvi_logs"]:
     try:
         os.mkdir(regressionDir+args.sim+"/"+d)
     except:

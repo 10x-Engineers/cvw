@@ -30,3 +30,11 @@
 [submodule "addins/ahbsdc"]
 	path = addins/ahbsdc
 	url = http://github.com/JacobPease/ahbsdc.git
+[submodule "addins/cvw-arch-functional-verif"]
+	path = addins/cvw-arch-functional-verif
+	url = https://github.com/10x-Engineers/cvw-arch-functional-verif
+	branch = master
+[submodule "addins/verilog-ethernet"]
+	sparseCheckout = true
+	path = addins/verilog-ethernet
+	url = https://github.com/ross144/verilog-ethernet.git

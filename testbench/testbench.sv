@@ -34,11 +34,9 @@
 `endif
 
 `ifdef RVVI_COVERAGE
-    `include "coverage/RISCV_trace_data.svh"
-    `include "coverage/test_vm39_coverage.sv"
-    `include "coverage/test_vm48_coverage.sv"
-    `include "coverage/test_zicbom_coverage.sv"
-    `include "coverage/test_zicntr_coverage.sv"
+    `include "RISCV_trace_data.svh"
+    `include "rvvicov.svh"
+    `include "wrapper.sv"
 `endif
 
 import cvw::*;
@@ -51,6 +49,7 @@ module testbench;
   parameter BPRED_LOGGER=0;
   parameter I_CACHE_ADDR_LOGGER=0;
   parameter D_CACHE_ADDR_LOGGER=0;
+  parameter RVVI_SYNTH_SUPPORTED=0;
   
   `ifdef USE_IMPERAS_DV
     import idvPkg::*;
@@ -121,6 +120,7 @@ module testbench;
   logic SelectTest;
   logic TestComplete;
   logic PrevPCZero;
+  logic RVVIStall;
 
   initial begin
     // look for arguments passed to simulation, or use defaults
@@ -469,7 +469,7 @@ module testbench;
   integer StartIndex;
   integer EndIndex;
   integer BaseIndex;
-  integer memFile, uncoreMemFile;
+  integer memFile;
   integer readResult;
   if (P.SDC_SUPPORTED) begin
     always @(posedge clk) begin
@@ -512,16 +512,8 @@ module testbench;
           end
           readResult = $fread(dut.uncoregen.uncore.ram.ram.memory.ram.RAM, memFile);
           $fclose(memFile);
-        end else begin
-          uncoreMemFile = $fopen(memfilename, "r");  // Is there a better way to test if a file exists?
-          if (uncoreMemFile == 0) begin
-            $display("Error: Could not open file %s", memfilename);
-            $finish;
-          end else begin
-            $fclose(uncoreMemFile);
-            $readmemh(memfilename, dut.uncoregen.uncore.ram.ram.memory.ram.RAM);
-          end
-        end
+        end else 
+          $readmemh(memfilename, dut.uncoregen.uncore.ram.ram.memory.ram.RAM);
         if (TEST == "embench") $display("Read memfile %s", memfilename);
       end
       if (CopyRAM) begin
@@ -596,7 +588,8 @@ module testbench;
     assign SDCIntr = 1'b0;
   end
 
-  wallypipelinedsoc  #(P) dut(.clk, .reset_ext, .reset, .HRDATAEXT, .HREADYEXT, .HRESPEXT, .HSELEXT, .HSELEXTSDC,
+  wallypipelinedsoc  #(P) dut(.clk, .reset_ext, .reset, .ExternalStall(RVVIStall), 
+    .HRDATAEXT, .HREADYEXT, .HRESPEXT, .HSELEXT, .HSELEXTSDC,
     .HCLK, .HRESETn, .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0), .GPIOIN, .GPIOOUT, .GPIOEN,
     .UARTSin, .UARTSout, .SDCIntr, .SPIIn, .SPIOut, .SPICS); 
@@ -605,6 +598,22 @@ module testbench;
   always begin
     clk = 1'b1; # 5; clk = 1'b0; # 5;
   end
+
+  if(RVVI_SYNTH_SUPPORTED) begin : rvvi_synth
+    localparam MAX_CSRS = 5;
+    localparam logic [31:0] RVVI_INIT_TIME_OUT = 32'd4;
+    localparam logic [31:0] RVVI_PACKET_DELAY = 32'd2;
+
+    logic [3:0]                                       mii_txd;
+    logic                                             mii_tx_en, mii_tx_er;
+
+    rvvitbwrapper #(P, MAX_CSRS, RVVI_INIT_TIME_OUT, RVVI_PACKET_DELAY) 
+    rvvitbwrapper(.clk, .reset, .RVVIStall, .mii_tx_clk(clk), .mii_txd, .mii_tx_en, .mii_tx_er,
+                  .mii_rx_clk(clk), .mii_rxd('0), .mii_rx_dv('0), .mii_rx_er('0));
+  end else begin
+    assign RVVIStall = '0;
+  end
+  
 
   /*
   // Print key info  each cycle for debugging
@@ -730,7 +739,7 @@ end
     
     void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VENDOR,            "riscv.ovpworld.org"));
     void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_NAME,              "riscv"));
-    void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VARIANT,           "RV64GCK"));
+    void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VARIANT,           "RV64GC"));
     void'(rvviRefConfigSetInt(IDV_CONFIG_MODEL_ADDRESS_BUS_WIDTH,     56));
     void'(rvviRefConfigSetInt(IDV_CONFIG_MAX_NET_LATENCY_RETIREMENTS, 6));
 
@@ -948,10 +957,7 @@ test_pmp_coverage #(P) pmp_inst(clk);
 `ifdef RVVI_COVERAGE
     rvviTrace #(.XLEN(P.XLEN), .FLEN(P.FLEN)) rvvi();
     wallyTracer #(P) wallyTracer(rvvi);
-    test_vm39_coverage #(P) vm39_inst(clk);
-    test_vm48_coverage #(P) vm48_inst(clk);
-    test_zicbom_coverage #(P) zicbom_inst(clk);
-    test_zicntr_coverage #(P) zicntr_inst(clk);
+    wrapper #(P) wrap(clk);
 `endif
 
 endmodule
