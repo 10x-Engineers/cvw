@@ -469,7 +469,7 @@ module testbench;
   integer StartIndex;
   integer EndIndex;
   integer BaseIndex;
-  integer memFile;
+  integer memFile, uncoreMemFile;
   integer readResult;
   if (P.SDC_SUPPORTED) begin
     always @(posedge clk) begin
@@ -512,8 +512,16 @@ module testbench;
           end
           readResult = $fread(dut.uncoregen.uncore.ram.ram.memory.ram.RAM, memFile);
           $fclose(memFile);
-        end else 
-          $readmemh(memfilename, dut.uncoregen.uncore.ram.ram.memory.ram.RAM);
+        end else begin
+          uncoreMemFile = $fopen(memfilename, "r");  // Is there a better way to test if a file exists?
+          if (uncoreMemFile == 0) begin
+            $display("Error: Could not open file %s", memfilename);
+            $finish;
+          end else begin
+            $fclose(uncoreMemFile);
+            $readmemh(memfilename, dut.uncoregen.uncore.ram.ram.memory.ram.RAM);
+          end
+        end
         if (TEST == "embench") $display("Read memfile %s", memfilename);
       end
       if (CopyRAM) begin
@@ -739,7 +747,7 @@ end
     
     void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VENDOR,            "riscv.ovpworld.org"));
     void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_NAME,              "riscv"));
-    void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VARIANT,           "RV64GC"));
+    void'(rvviRefConfigSetString(IDV_CONFIG_MODEL_VARIANT,           "RV64GCK"));
     void'(rvviRefConfigSetInt(IDV_CONFIG_MODEL_ADDRESS_BUS_WIDTH,     56));
     void'(rvviRefConfigSetInt(IDV_CONFIG_MAX_NET_LATENCY_RETIREMENTS, 6));
 
@@ -954,6 +962,7 @@ test_pmp_coverage #(P) pmp_inst(clk);
 `endif
   /* verilator lint_on WIDTHTRUNC */
   /* verilator lint_on WIDTHEXPAND */
+
 `ifdef RVVI_COVERAGE
     rvviTrace #(.XLEN(P.XLEN), .FLEN(P.FLEN)) rvvi();
     wallyTracer #(P) wallyTracer(rvvi);

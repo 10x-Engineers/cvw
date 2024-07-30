@@ -4,12 +4,17 @@ work_dir = ./riscof_work
 work = ./work
 arch_workdir = $(work)/riscv-arch-test
 wally_workdir = $(work)/wally-riscv-arch-test
+custom_test_dir = ../../addins/cvw-arch-functional-verif/test
+submodule_work_dir = ../../addins/cvw-arch-functional-verif/riscof_work
 
 current_dir = $(shell pwd)
 #XLEN    ?= 64
 
 all: root arch32 wally32 arch32e arch64 wally64
+
 wally-riscv-arch-test: root wally64 wally32
+
+custom: new_test
 
 root:
 	mkdir -p $(work_dir)
@@ -40,13 +45,16 @@ wally32:
 	rsync -a $(work_dir)/rv32i_m/ $(wally_workdir)/rv32i_m/ || echo "error suppressed"
 
 wally64:
-	riscof run --work-dir=$(work_dir) --config=config64.ini --suite=$(wally_dir)/riscv-test-suite/ --env=$(wally_dir)/riscv-test-suite/env --no-browser --no-dut-run
+	riscof run --work-dir=$(work_dir) --config=config64.ini --suite=$(wally_dir)/riscv-test-suite/ --env=$(wally_dir)/riscv-test-suite/env --no-browser
 	rsync -a $(work_dir)/rv64i_m/ $(wally_workdir)/rv64i_m/ || echo "error suppressed"
 #	 Also copy F and D tests to RV64
 	rsync -a $(work_dir)/rv32i_m/ $(wally_workdir)/rv64i_m/ || echo "error suppressed"
 
 quad64:
 	riscof run --work-dir=$(work_dir) --config=config64.ini --suite=$(wally_dir)/riscv-test-suite/rv64i_m/Q/riscv-ctg/tests/ --env=$(wally_dir)/riscv-test-suite/env
+	
+new_test:
+	riscof run --work-dir=$(submodule_work_dir) --config=config64.ini --suite=$(custom_test_dir)/ --env=$(wally_dir)/riscv-test-suite/env --no-browser
 
 #wally32e:
 #	riscof run --work-dir=$(work_dir) --config=config32e.ini --suite=$(wally_dir)/riscv-test-suite/ --env=$(wally_dir)/riscv-test-suite/env --no-browser --no-dut-run
@@ -66,3 +74,4 @@ clean:
 	rm -rf $(work_dir)
 	rm -rf $(wally_workdir)
 	rm -rf $(arch_workdir)
+	rm -rf $(submodule_wor_dir)

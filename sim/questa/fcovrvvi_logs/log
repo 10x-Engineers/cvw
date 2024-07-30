@@ -1,8 +1,0 @@
-QuestaSim-64 vcover 2021.2_1 Coverage Utility 2021.05 May 15 2021
-Start time: 13:25:41 on Jul 30,2024
-vcover merge -out /home/lpt-10xe/cvw/sim/questa/fcovrvvi_ucdb/fcovrvvi.ucdb /home/lpt-10xe/cvw/sim/questa/fcovrvvi_ucdb/rv64gc_*.ucdb -logfile /home/lpt-10xe/cvw/sim/questa/fcovrvvi_logs/log 
-QuestaSim-64 vcover 2021.2_1 Coverage Utility 2021.05 May 15 2021
-** Warning: (vcover-17386) Ignoring missing input file '/home/lpt-10xe/cvw/sim/questa/fcovrvvi_ucdb/rv64gc_*.ucdb'.
-All files were empty. No merged database will be produced
-End time: 13:25:42 on Jul 30,2024, Elapsed time: 0:00:01
-Errors: 0, Warnings: 1

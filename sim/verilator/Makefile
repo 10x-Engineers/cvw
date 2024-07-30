@@ -44,11 +44,7 @@ default: run
 
 run: wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH}
 	mkdir -p $(VERILATOR_DIR)/logs
-<<<<<<< HEAD
 	wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH} ${ARGTEST} $(EXTRA_ARGS) 
-=======
-	wkdir/$(WALLYCONF)_$(TEST)/V${TESTBENCH} ${ARGTEST} 
->>>>>>> 9471dcd29... Refactored the fpga and testbench so the RVVI can be synthesized cleanly and simulated without any major code changes.
 
 profile: obj_dir_profiling/V${TESTBENCH}_$(WALLYCONF)
 	$(VERILATOR_DIR)/obj_dir_profiling/V${TESTBENCH}_$(WALLYCONF) ${ARGTEST}
