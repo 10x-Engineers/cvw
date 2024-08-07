@@ -40,6 +40,7 @@ module fpgaTop
    // UART Signals
    input         UARTSin,
    output        UARTSout,
+<<<<<<< HEAD
 
    // SDC Signals connecting to an SPI peripheral
    input         SDCIn,
@@ -65,6 +66,46 @@ module fpgaTop
    output [0:0]  ddr3_cs_n,
    output [1:0]  ddr3_dm,
    output [0:0]  ddr3_odt
+=======
+
+   // SDC Signals connecting to an SPI peripheral
+   input         SDCIn,
+   output        SDCCLK,
+   output        SDCCmd,
+   output        SDCCS,
+   input         SDCCD,
+   input         SDCWP,         
+ /*
+     * Ethernet: 100BASE-T MII
+     */
+    output       phy_ref_clk,
+    input        phy_rx_clk,
+    input  [3:0] phy_rxd,
+    input        phy_rx_dv,
+    input        phy_rx_er,
+    input        phy_tx_clk,
+    output [3:0] phy_txd,
+    output       phy_tx_en,
+    input        phy_col, // nc
+    input        phy_crs, // nc
+    output       phy_reset_n,
+
+   inout [15:0]    ddr3_dq,
+   inout [1:0]     ddr3_dqs_n,
+   inout [1:0]     ddr3_dqs_p,
+   output [13:0]   ddr3_addr,
+   output [2:0]    ddr3_ba,
+   output          ddr3_ras_n,
+   output          ddr3_cas_n,
+   output          ddr3_we_n,
+   output          ddr3_reset_n,
+   output [0:0]    ddr3_ck_p,
+   output [0:0]    ddr3_ck_n,
+   output [0:0]    ddr3_cke,
+   output [0:0]    ddr3_cs_n,
+   output [1:0]    ddr3_dm,
+   output [0:0]    ddr3_odt
+>>>>>>> origin/main
    );
 
   // MMCM Signals
@@ -193,7 +234,8 @@ module fpgaTop
   wire             mmcm_locked;
   wire [11:0]      device_temp;
   wire             mmcm1_locked;
-  
+
+(* mark_debug = "true" *)  logic              RVVIStall;
 
   assign GPIOIN = {25'b0, SDCCD, SDCWP, 1'b0, GPI};
   assign GPO = GPIOOUT[4:0];
@@ -244,7 +286,11 @@ module fpgaTop
                     .HADDR, .HWDATA, .HWSTRB, .HWRITE, .HSIZE, .HBURST, .HPROT,
                     .HTRANS, .HMASTLOCK, .HREADY, .TIMECLK(1'b0), 
                     .GPIOIN, .GPIOOUT, .GPIOEN,
+<<<<<<< HEAD
                     .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK); 
+=======
+                    .UARTSin, .UARTSout, .SDCIn, .SDCCmd, .SDCCS(SDCCSin), .SDCCLK, .ExternalStall(RVVIStall)); 
+>>>>>>> origin/main
 
 
   // ahb lite to axi bridge

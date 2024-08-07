@@ -35,6 +35,8 @@ module wallypipelinedsoc import cvw::*; #(parameter cvw_t P)  (
   input  logic [P.AHBW-1:0]   HRDATAEXT,
   input  logic                HREADYEXT, HRESPEXT,
   output logic                HSELEXT,
+  // fpga debug signals
+  input  logic                ExternalStall,
   // outputs to external memory, shared with uncore memory
   output logic                HCLK, HRESETn,
   output logic [P.PA_BITS-1:0]  HADDR,
